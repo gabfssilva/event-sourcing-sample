@@ -7,12 +7,15 @@ import br.com.uol.plataforma.event.sourcing.store.BankAccountEventStore._
 
 object BankAccountCommands {
   class CreateAccountCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (request) => (state) => {
+    override def execute: ExecutionProduce = (request) => (_) => {
       val event = BankAccountCreated()
       event.id = request.id
       event.owner = request.owner
       event
     }
+
+    override def validate: ValidationProduce =
+      request => state => CommandValidation.validate(state.status == null, "this account is already created")
   }
 
   class DepositCommand extends Command[Request, BankAccount] {
@@ -29,6 +32,10 @@ object BankAccountCommands {
       event.amount = request.amount
       event
     }
+
+    override def validate: ValidationProduce =
+      request => state => CommandValidation.validate((state.balance[Int] - request.amount[Int]) >= 0,
+        s"the account cannot have a balance lower than zero. current balance: ${state.balance[Int]}, withdrawal amount: ${request.amount[Int]}")
   }
 
   class ChangeOwnerCommand extends Command[Request, BankAccount] {
@@ -45,6 +52,9 @@ object BankAccountCommands {
       event.closeReason = request.reason
       event
     }
+
+    override def validate: ValidationProduce =
+      request => state => CommandValidation.validate(!state.status.equals("CLOSED"), "this account is already closed")
   }
 
   type ExecutionRequest = (Request) => (BankAccount) => BankAccount

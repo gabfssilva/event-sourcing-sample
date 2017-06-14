@@ -21,8 +21,7 @@ class DynamicData(var data: Map[String, Any] = Map()) extends Dynamic {
   def canEqual(other: Any): Boolean = other.isInstanceOf[DynamicData]
 
   override def equals(other: Any): Boolean = other match {
-    case that: DynamicData =>
-      (that canEqual this) && data.filterNot((kv) => that.data.get(kv._1).get.equals(kv._2)).isEmpty
+    case that: DynamicData => (that canEqual this) && data.forall((kv) => that.data(kv._1).equals(kv._2))
     case _ => false
   }
 

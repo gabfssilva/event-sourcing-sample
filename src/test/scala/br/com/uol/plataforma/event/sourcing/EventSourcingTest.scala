@@ -29,10 +29,6 @@ class EventSourcingTest extends FeatureSpec with Matchers {
       val playedState: BankAccount = events.play(BankAccount(aggregationId))
 
       actualState shouldEqual playedState
-
-      println(actualState)
-      println(playedState)
-      println(events)
     }
   }
 }

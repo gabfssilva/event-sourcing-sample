@@ -1,5 +1,6 @@
 package br.com.uol.plataforma.event.sourcing.store
 
+import br.com.uol.plataforma.event.sourcing.commands.Command.AggregationId
 import br.com.uol.plataforma.event.sourcing.model.Event
 import br.com.uol.plataforma.event.sourcing.state.State
 
