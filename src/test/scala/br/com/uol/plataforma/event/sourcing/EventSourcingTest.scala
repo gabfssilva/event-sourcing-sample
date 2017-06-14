@@ -3,8 +3,8 @@ package br.com.uol.plataforma.event.sourcing
 import java.util.UUID
 
 import br.com.uol.plataforma.event.sourcing.commands.BankAccountCommands._
-import br.com.uol.plataforma.event.sourcing.model.Request
-import br.com.uol.plataforma.event.sourcing.player.EventPlayer
+import br.com.uol.plataforma.event.sourcing.model.{Event, Request}
+import br.com.uol.plataforma.event.sourcing.player.EventPlayer._
 import br.com.uol.plataforma.event.sourcing.state.BankAccount
 import br.com.uol.plataforma.event.sourcing.store.BankAccountEventStore.eventStore
 import org.scalatest.{FeatureSpec, Matchers}
@@ -18,15 +18,15 @@ class EventSourcingTest extends FeatureSpec with Matchers {
       val aggregateId = UUID.randomUUID().toString
 
       val f =
-        createAccount(aggregateId, Request("owner" -> "John Doe", "id" -> 123))
-          .andThen(deposit(aggregateId, Request("amount" -> 20)))
-          .andThen(changeOwner(aggregateId, Request("newOwner" -> "Jane Doe")))
-          .andThen(withdrawal(aggregateId, Request("amount" -> 10)))
-          .andThen(close(aggregateId, Request("reason" -> "Unavailable address")))
+        createAccount(Request("owner" -> "John Doe", "id" -> 123))
+          .andThen(deposit(Request("amount" -> 20)))
+          .andThen(changeOwner(Request("newOwner" -> "Jane Doe")))
+          .andThen(withdrawal(Request("amount" -> 10)))
+          .andThen(close(Request("reason" -> "Unavailable address")))
 
-      val actualState: BankAccount = f(BankAccount())
-      val events = eventStore.get(aggregateId)
-      val playedState: BankAccount = EventPlayer.play(BankAccount(), aggregateId, events)
+      val actualState: BankAccount = f(BankAccount(aggregateId))
+      val events: Seq[Event[BankAccount]] = eventStore.get(aggregateId)
+      val playedState: BankAccount = events.play(BankAccount(aggregateId))
 
       actualState shouldEqual playedState
     }

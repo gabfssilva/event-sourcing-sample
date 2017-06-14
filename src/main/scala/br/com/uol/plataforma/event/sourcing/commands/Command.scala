@@ -2,6 +2,7 @@ package br.com.uol.plataforma.event.sourcing.commands
 
 import br.com.uol.plataforma.event.sourcing.commands.Command.AggregationId
 import br.com.uol.plataforma.event.sourcing.model.Event
+import br.com.uol.plataforma.event.sourcing.state.State
 import br.com.uol.plataforma.event.sourcing.store.EventStore
 
 /**
@@ -11,20 +12,20 @@ object Command {
   type AggregationId = String
 }
 
-abstract class Command[Request, State](implicit val eventStore: EventStore[State]) extends (((AggregationId, Request, State)) => (State)) {
-  type ExecutionProduce = (AggregationId, Request) => (State) => Event[State]
+abstract class Command[Request, S <: State](implicit val eventStore: EventStore[S]) extends (((Request, S)) => (S)) {
+  type ExecutionProduce = (AggregationId, Request) => (S) => Event[S]
 
   def execute: ExecutionProduce
 
-  implicit class CommandTupleImplicit(val tuple: (AggregationId, Request, State)) {
-    lazy val aggregateId: String = tuple._1
-    lazy val request: Request = tuple._2
-    lazy val actualState: State = tuple._3
+  implicit class CommandTupleImplicit(val tuple: (Request, S)) {
+    lazy val request: Request = tuple._1
+    lazy val actualState: S = tuple._2
   }
 
-  override def apply(parameters: (AggregationId, Request, State)): State = {
-    val event: Event[State] = execute(parameters.aggregateId, parameters.request)(parameters.actualState)
-    eventStore.add(parameters.aggregateId, event)
-    event applyTo(parameters.aggregateId, parameters.actualState)
+  override def apply(parameters: (Request, S)): S = {
+    val aggregationId = parameters.actualState.aggregationId
+    val event: Event[S] = execute(aggregationId, parameters.request)(parameters.actualState)
+    eventStore.add(aggregationId, event)
+    event applyTo(parameters.actualState)
   }
 }

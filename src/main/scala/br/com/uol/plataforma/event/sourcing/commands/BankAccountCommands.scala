@@ -47,11 +47,11 @@ object BankAccountCommands {
     }
   }
 
-  type ExecutionRequest = (String, Request) => (BankAccount) => BankAccount
+  type ExecutionRequest = (Request) => (BankAccount) => BankAccount
 
-  val createAccount: ExecutionRequest = { (id, req) => (account) => new CreateAccountCommand().apply(id, req, account) }
-  val withdrawal: ExecutionRequest = { (id, req) => (account) => new WithdrawalCommand().apply(id, req, account) }
-  val deposit: ExecutionRequest = { (id, req) => (account) => new DepositCommand().apply(id, req, account) }
-  val changeOwner: ExecutionRequest = { (id, req) => (account) => new ChangeOwnerCommand().apply(id, req, account) }
-  val close: ExecutionRequest = { (id, req) => (account) => new CloseCommand().apply(id, req, account) }
+  val createAccount: ExecutionRequest = { (req) => (account) => new CreateAccountCommand().apply(req, account) }
+  val withdrawal: ExecutionRequest = { (req) => (account) => new WithdrawalCommand().apply(req, account) }
+  val deposit: ExecutionRequest = { (req) => (account) => new DepositCommand().apply(req, account) }
+  val changeOwner: ExecutionRequest = { (req) => (account) => new ChangeOwnerCommand().apply(req, account) }
+  val close: ExecutionRequest = { (req) => (account) => new CloseCommand().apply(req, account) }
 }

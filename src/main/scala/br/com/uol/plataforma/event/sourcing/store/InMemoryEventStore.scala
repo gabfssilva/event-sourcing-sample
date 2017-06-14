@@ -5,15 +5,16 @@ import scala.collection.convert.decorateAsScala._
 import java.util.concurrent.ConcurrentHashMap
 
 import br.com.uol.plataforma.event.sourcing.model.Event
+import br.com.uol.plataforma.event.sourcing.state.State
 
-class InMemoryEventStore[T] extends EventStore[T] {
+class InMemoryEventStore[S <: State] extends EventStore[S] {
   val events =
-    new collection.mutable.HashMap[String, collection.mutable.Set[Event[T]]]
-      with collection.mutable.MultiMap[String, Event[T]]
+    new collection.mutable.HashMap[String, collection.mutable.Set[Event[S]]]
+      with collection.mutable.MultiMap[String, Event[S]]
 
-  override def add(aggregateId: String, event: Event[T]): Unit = events.synchronized {
+  override def add(aggregateId: String, event: Event[S]): Unit = events.synchronized {
     events.addBinding(aggregateId, event)
   }
 
-  override def get(aggregateId: String): Seq[Event[T]] = events(aggregateId).toSeq.sortBy(_.eventDate)
+  override def get(aggregateId: String): Seq[Event[S]] = events(aggregateId).toSeq.sortBy(_.eventDate)
 }

@@ -16,8 +16,6 @@ class DynamicData(var data: Map[String, Any] = Map()) extends Dynamic {
     def as[T] = any.asInstanceOf[T]
   }
 
-
-
   override def toString = s"{${data.map({ case (k, v) => s"$k=$v" }).mkString(",")}}"
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[DynamicData]
