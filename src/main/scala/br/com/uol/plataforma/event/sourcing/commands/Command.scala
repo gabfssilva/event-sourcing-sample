@@ -13,7 +13,7 @@ object Command {
 }
 
 abstract class Command[Request, S <: State](implicit val eventStore: EventStore[S]) extends (((Request, S)) => (S)) {
-  type ExecutionProduce = (AggregationId, Request) => (S) => Event[S]
+  type ExecutionProduce = (Request) => (S) => Event[S]
 
   def execute: ExecutionProduce
 
@@ -24,7 +24,7 @@ abstract class Command[Request, S <: State](implicit val eventStore: EventStore[
 
   override def apply(parameters: (Request, S)): S = {
     val aggregationId = parameters.actualState.aggregationId
-    val event: Event[S] = execute(aggregationId, parameters.request)(parameters.actualState)
+    val event: Event[S] = execute(parameters.request)(parameters.actualState)
     eventStore.add(aggregationId, event)
     event applyTo(parameters.actualState)
   }

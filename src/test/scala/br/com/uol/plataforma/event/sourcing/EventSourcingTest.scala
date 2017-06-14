@@ -15,7 +15,7 @@ import org.scalatest.{FeatureSpec, Matchers}
 class EventSourcingTest extends FeatureSpec with Matchers {
   feature("Creating an account and then closing it") {
     scenario("Create an account and then assert that replay restores the actual state of the BankAccount object") {
-      val aggregateId = UUID.randomUUID().toString
+      val aggregationId = UUID.randomUUID().toString
 
       val f =
         createAccount(Request("owner" -> "John Doe", "id" -> 123))
@@ -24,11 +24,15 @@ class EventSourcingTest extends FeatureSpec with Matchers {
           .andThen(withdrawal(Request("amount" -> 10)))
           .andThen(close(Request("reason" -> "Unavailable address")))
 
-      val actualState: BankAccount = f(BankAccount(aggregateId))
-      val events: Seq[Event[BankAccount]] = eventStore.get(aggregateId)
-      val playedState: BankAccount = events.play(BankAccount(aggregateId))
+      val actualState: BankAccount = f(BankAccount(aggregationId))
+      val events: Seq[Event[BankAccount]] = eventStore.get(aggregationId)
+      val playedState: BankAccount = events.play(BankAccount(aggregationId))
 
       actualState shouldEqual playedState
+
+      println(actualState)
+      println(playedState)
+      println(events)
     }
   }
 }

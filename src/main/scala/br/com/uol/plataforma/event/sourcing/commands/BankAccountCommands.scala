@@ -7,7 +7,7 @@ import br.com.uol.plataforma.event.sourcing.store.BankAccountEventStore._
 
 object BankAccountCommands {
   class CreateAccountCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (_, request) => (_) => {
+    override def execute: ExecutionProduce = (request) => (state) => {
       val event = BankAccountCreated()
       event.id = request.id
       event.owner = request.owner
@@ -16,7 +16,7 @@ object BankAccountCommands {
   }
 
   class DepositCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (_, request) => (_) => {
+    override def execute: ExecutionProduce = (request) => (_) => {
       val event = DepositPerformed()
       event.amount = request.amount
       event
@@ -24,7 +24,7 @@ object BankAccountCommands {
   }
 
   class WithdrawalCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (_, request) => (_) => {
+    override def execute: ExecutionProduce = (request) => (_) => {
       val event = WithdrawalPerformed()
       event.amount = request.amount
       event
@@ -32,7 +32,7 @@ object BankAccountCommands {
   }
 
   class ChangeOwnerCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (_, request) => (_) => {
+    override def execute: ExecutionProduce = (request) => (_) => {
       val event = OwnerChanged()
       event.newOwner = request.newOwner
       event
@@ -40,7 +40,7 @@ object BankAccountCommands {
   }
 
   class CloseCommand extends Command[Request, BankAccount] {
-    override def execute: ExecutionProduce = (_, request) => (_) => {
+    override def execute: ExecutionProduce = (request) => (_) => {
       val event = BankAccountClosed()
       event.closeReason = request.reason
       event

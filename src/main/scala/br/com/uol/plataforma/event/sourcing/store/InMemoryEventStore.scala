@@ -1,11 +1,9 @@
 package br.com.uol.plataforma.event.sourcing.store
 
-import scala.collection._
-import scala.collection.convert.decorateAsScala._
-import java.util.concurrent.ConcurrentHashMap
-
 import br.com.uol.plataforma.event.sourcing.model.Event
 import br.com.uol.plataforma.event.sourcing.state.State
+
+import scala.collection._
 
 class InMemoryEventStore[S <: State] extends EventStore[S] {
   val events =
