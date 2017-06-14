@@ -6,7 +6,6 @@ import br.com.uol.plataforma.event.sourcing.state.BankAccount
 import br.com.uol.plataforma.event.sourcing.store.BankAccountEventStore._
 
 object BankAccountCommands {
-
   class CreateAccountCommand extends Command[Request, BankAccount] {
     override def execute: ExecutionProduce = (_, request) => (_) => {
       val event = BankAccountCreated()
